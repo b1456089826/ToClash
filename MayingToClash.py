@@ -164,6 +164,7 @@ def setPG(nodes):
 def getClash(nodes, group):
     gener = getBasefile(
         'https://raw.githubusercontent.com/b1456089826/ToClash/master/start.yml')
+    info = setNodes(nodes) + setPG(nodes)
     with open("./configs.yml", "w", encoding="UTF-8") as f:
         f.writelines(gener)
         f.writelines(info)
@@ -194,7 +195,7 @@ def getClash(nodes, group):
                                                                                                         ',国内地址',
                                                                                                         rules2))))))))
     fr = getBasefile('https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/LAZY_RULES/clash.yaml')
-    line_new3 = re.sub(r',Proxy', ',代理模式', re.sub(r',DIRECT', ',国内网站', re.sub(r',REJECT', ',广告', fr.split('Rule:')[1])))
+    line_new3 = re.sub(r',Proxy', ',代理模式', re.sub(r',DIRECT', ',国内地址', re.sub(r',REJECT', ',广告网站', fr.split('Rule:')[1])))
     with open("./configs.yml", "a", encoding="UTF-8") as f:
         f.writelines(str(line_new))
         f.writelines("\n")
@@ -229,12 +230,12 @@ def clean(argv):
 
     outtmp = re.sub(r'^\n|\n+(?=\n)|\n$','',outstring)
     outstring = outtmp
-    f = open(argv[1], 'w')
+    f = open(argv[1], 'w',encoding='UTF-8')
     f.write(outstring)
     f.close()
 
 if __name__ == "__main__":
-    url = "" #输入订阅地址
+    url = ""
     allnodes = []
     links = getAllLinks(url)
     link = links[0].split('//')[1].split("'")[0]
@@ -249,6 +250,13 @@ if __name__ == "__main__":
             getClash(nodes, group)
             with open("./configs.yml", encoding="UTF-8") as f:
                 if f.read().find('错误') < 0:
+                    with open("./configs.yml", "r+", encoding="UTF-8") as f1:
+                        infos = f1.read()
+                        line_new = re.sub(r'\\t', '', infos)
+                        f1.seek(0)  # 将指针位置指到文件开头（注意：一定要有这步操作，不然无法清空文件）
+                        f1.truncate()  # 清空文件内容（仅当以 "r+"   "rb+"    "w"   "wb" "wb+"等以可写模式打开的文件才可以执行该功能）
+                        f1.write(line_new)
+                        f1.close()
                     quchong('./configs.yml', './configss.yml')
                     print("转换成功，文件名称为" + group + ".yaml和config.yml，程序退出")
                     clean(['./configss.yml', './config.yml'])
