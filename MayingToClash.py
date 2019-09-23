@@ -112,7 +112,8 @@ def setNodes(nodes):
 def setPG(nodes):
     # 设置策略组 auto,Fallback-auto,Proxy
     proxy_names = []
-    proxys_names = ['代理模式', 'REJECT', 'DIRECT']
+    proxys_names = ['代理模式', 'DIRECT', 'REJECT']
+    cnproxys_names = ['DIRECT', '代理模式', 'REJECT']
     select_names = []
     auto_names = []
     fallback_names = []
@@ -121,7 +122,7 @@ def setPG(nodes):
     select_names.append("手动选择")
     select_names.append("DIRECT")
     select_names.append("REJECT")
-    ad_names = ['REJECT', 'DIRECT']
+    ad_names = ['REJECT', 'DIRECT', '代理模式']
     cn_names = ['DIRECT', '代理模式']
     for node in nodes:
         if node[0].find('WRR') >= 0 or node[0].find('TKA') >= 0:
@@ -153,7 +154,7 @@ def setPG(nodes):
     Others = "- { name: '其他', type: select, proxies: " + str(proxys_names) + " }\n"
     Apple = "- { name: 'Apple网站', type: select, proxies: " + str(proxys_names) + " }\n"
     GlobalTV = "- { name: '海外视频', type: select, proxies: " + str(proxys_names) + " }\n"
-    AsianTV = "- { name: '国内视频', type: select, proxies: " + str(proxys_names) + " }\n"
+    AsianTV = "- { name: '国内视频', type: select, proxies: " + str(cnproxys_names) + " }\n"
     AdBlock = "- { name: '广告网站', type: select, proxies: " + str(ad_names) + " }\n"
     ProxyGroup = ['\nProxy Group:\n', auto, Fallback, LoadBalance, Select, Proxy, Domestic, Others, Apple, GlobalTV,
                   AsianTV, AdBlock]
@@ -195,44 +196,53 @@ def getClash(nodes, group):
                                                                                                         ',国内地址',
                                                                                                         rules2))))))))
     fr = getBasefile('https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/LAZY_RULES/clash.yaml')
-    line_new3 = re.sub(r',Proxy', ',代理模式', re.sub(r',DIRECT', ',国内地址', re.sub(r',REJECT', ',广告网站', fr.split('Rule:')[1])))
+    line_new3 = re.sub(r',Proxy', ',代理模式',
+                       re.sub(r',DIRECT', ',国内地址', re.sub(r',REJECT', ',广告网站', fr.split('Rule:')[1])))
+    frs = getBasefile('https://raw.githubusercontent.com/ConnersHua/Profiles/master/Clash/Pro.yaml')
+    line_new4 = re.sub(r',PROXY', ',代理模式', re.sub(r',REJECT', ',广告网站', re.sub(r',Apple', ',Apple网站',
+                                                                              re.sub(r',ForeignMedia', ',海外视频',
+                                                                                     re.sub(r',Hijacking', ',广告网站',
+                                                                                            re.sub(r',Final', ',代理模式',
+                                                                                                   re.sub(r',DomesticMedia',
+                                                                                                          ',国内视频', re.sub(
+                                                                                                           r',DIRECT',
+                                                                                                           ',国内地址',
+                                                                                                           frs.split(
+                                                                                                               'Rule:')[
+                                                                                                               1]))))))))
+    lists=[]
     with open("./configs.yml", "a", encoding="UTF-8") as f:
         f.writelines(str(line_new))
         f.writelines("\n")
         f.writelines(str(line_new2))
         f.writelines(str(line_new3))
+        f.writelines(str(line_new4))
         f.close()
 
 
-def quchong(infile, outfile):
+
+
+
+def clean(infile, outfile):
     infopen = open(infile, 'r', encoding='utf-8')
-    outopen = open(outfile, 'w', encoding='utf-8')
+    outstring = ''
     lines = infopen.readlines()
     list_1 = []
     for line in lines:
         if line not in list_1:
             list_1.append(line)
-            outopen.write(line)
+            outstring += line
     infopen.close()
-    outopen.close()
-def clean(argv):
-
-    rf = open(argv[0],'r+',encoding='UTF-8')
-    outstring = ''
-    try:
-        outstring = rf.read()
-    finally:
-        rf.close()
-
     m = re.compile(r'#.*')
-    outtmp = re.sub(m,'',outstring)
+    outtmp = re.sub(m, '', outstring)
     outstring = outtmp
 
-    outtmp = re.sub(r'^\n|\n+(?=\n)|\n$','',outstring)
+    outtmp = re.sub(r'^\n|\n+(?=\n)|\n$', '', outstring)
     outstring = outtmp
-    f = open(argv[1], 'w',encoding='UTF-8')
+    f = open(outfile, 'w', encoding='UTF-8')
     f.write(outstring)
     f.close()
+
 
 if __name__ == "__main__":
     url = ""
@@ -257,12 +267,10 @@ if __name__ == "__main__":
                         f1.truncate()  # 清空文件内容（仅当以 "r+"   "rb+"    "w"   "wb" "wb+"等以可写模式打开的文件才可以执行该功能）
                         f1.write(line_new)
                         f1.close()
-                    quchong('./configs.yml', './configss.yml')
+                    clean('./configs.yml', './config.yml')
+                    clean('./configs.yml', './' + group + '.yaml')
                     print("转换成功，文件名称为" + group + ".yaml和config.yml，程序退出")
-                    clean(['./configss.yml', './config.yml'])
-                    clean(['./configss.yml', './' + group + '.yaml'])
                     f.close()
-                os.remove("./configss.yml")
                 os.remove("./configs.yml")
                 error = 0
             if error == 0:
