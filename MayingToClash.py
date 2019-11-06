@@ -200,7 +200,7 @@ def getClash(nodes, group):
                        re.sub(r',DIRECT', ',国内地址', re.sub(r',REJECT', ',广告网站', fr.split('Rule:')[1])))
     frs = getBasefile('https://raw.githubusercontent.com/ConnersHua/Profiles/master/Clash/Pro.yaml')
     line_new4 = re.sub(r',PROXY', ',代理模式', re.sub(r',REJECT', ',广告网站', re.sub(r',Apple', ',Apple网站',
-                                                                              re.sub(r',ForeignMedia', ',海外视频',
+                                                                              re.sub(r',GlobalMedia', ',海外视频',
                                                                                      re.sub(r',Hijacking', ',广告网站',
                                                                                             re.sub(r',Final', ',代理模式',
                                                                                                    re.sub(r',DomesticMedia',
